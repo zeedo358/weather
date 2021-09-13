@@ -54,9 +54,8 @@ class Parser:
 
 	async def google_parser(self):
 		# taking information from the google website
-		day = str(self.date.date_)
 		separator = r'\d+'
-		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
+		information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}
 		#get fallings
 		soup = await self._get_soup(self.urls['google'])
 		items = soup.find_all('div',class_ = 'XwOqJe')
@@ -71,27 +70,25 @@ class Parser:
 		#average fallings for time:
 		if self.date.date_ != self.date.date_.today():
 			fallings_for_time = [sum(fallings[0:7])/6,sum(fallings[7:13])/6,sum(fallings[13:19])/6,sum(fallings[19:24])/6] # 6 hour half of day
-			information[day]['fallings'] = fallings_for_time
+			information['fallings'] = fallings_for_time
 
 		# average fallings
 		avg = sum(fallings) / len(fallings)
-		information[day]['avg_fallings'] = avg
+		information['avg_fallings'] = avg
 
 		#average temperature
 		temperature = soup.find('span',id = 'wob_tm').text
-		information[day]['avg_temp'] = float(temperature)
+		information['avg_temp'] = float(temperature)
 
 		#kind of weather
 		kind = soup.find('span',id = 'wob_dc').text
-		information[day]['kind_of_weather'] = kind
+		information['kind_of_weather'] = kind
 
 		return information
 
 	async def meteotrend_parser(self):
 		# taking information from the meteotrend website
-		day = str(self.date.date_)
-		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
-		separator = r'\d+\,\d+'
+		information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}
 		times = ['ніч','ранок','день','вечір']
 		fell_rain = 0
 		searched_day = '{}, {} {} {}'.format(self.date.get_day(),self.date.date_.day,self.date.get_month(),self.date.date_.year)
@@ -113,9 +110,9 @@ class Parser:
 				if fallings:
 					fell_rain = float(fallings[0][:-2].replace(',','.')) * 30
 					if fell_rain > 100: fell_rain = 100
-					information[day]['fallings'][key] = fell_rain
+					information['fallings'][key] = fell_rain
 				else:
-					information[day]['fallings'][key] = 0
+					information['fallings'][key] = 0
 
 				data = [item.text for item in info.find('td',class_ = 't0').find_all('b')]
 				if len(data) == 3:
@@ -124,30 +121,29 @@ class Parser:
 				else:
 					avg_temp = (float(data[0][:3])+float(data[0][:3]))/2
 					mini_desc = data[1]
-				information[day]['temp'][key] = avg_temp
+				information['temp'][key] = avg_temp
 				#taking kind of weather from middle time of day 
 				if key == 2:
-					information[day]['kind_of_weather'] = mini_desc
+					information['kind_of_weather'] = mini_desc
 		# average temperature, fallings
 		len_temp = 0
 		len_fallings = 0
-		for elem,elem2 in zip(information[day]['temp'],information[day]['fallings']):
+		for elem,elem2 in zip(information['temp'],information['fallings']):
 			if elem != None:
-				information[day]['avg_temp'] += elem
+				information['avg_temp'] += elem
 				len_temp += 1
 			if elem2 != None:
-				information[day]['avg_fallings'] += elem2
+				information['avg_fallings'] += elem2
 				len_fallings += 1
 
-		information[day]['avg_temp'] /= len_temp
-		information[day]['avg_fallings'] /= len_fallings
+		information['avg_temp'] /= len_temp
+		information['avg_fallings'] /= len_fallings
 
 		return information
 
 	async def meteoprog_parser(self):
 		# taking information from the meteoprog website
-		day = str(self.date.date_)
-		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
+		information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}
 		searched_day = '{} {},'.format(self.date.date_.day,self.date.get_month())
 	
 		soup,soup2 = await asyncio.gather(*[self._get_soup(url) for url in self.urls['meteoprog']])
@@ -169,22 +165,21 @@ class Parser:
 			i += 4
 			
 		#kind of weather
-		information[day]['kind_of_weather'] = data[searched_day][0].split('.')[0]
+		information['kind_of_weather'] = data[searched_day][0].split('.')[0]
 		# avg temp and temperature
 		len_temp = 0
 		for i,elem in enumerate(data[searched_day][1:]):
-			information[day]['temp'][i] = float(elem)
+			information['temp'][i] = float(elem)
 			if elem != None:
-				information[day]['avg_temp'] += float(elem)
+				information['avg_temp'] += float(elem)
 				len_temp += 1
-		information[day]['avg_temp'] /= len_temp
+		information['avg_temp'] /= len_temp
 
 		return information
 
 	async def pogoda33_parser(self):
 		# taking information from the pogoda33 website
-		day = str(self.date.date_)
-		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
+		information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}
 
 		soup = await self._get_soup(self.urls['pogoda33'])
 		# time starts with 00:00 step = 3 hours
@@ -195,24 +190,23 @@ class Parser:
 
 		division_in_days = ((self.date.date_ - self.date.date_.today()).days) * 8 # 8 hours at half a day
 		# temp and avg_temp
-		information[day]['temp'] = [sum(float(elem[:-1]) for elem in temperature[division_in_days:division_in_days + 3])/3,sum(float(elem[:-1]) for elem in temperature[division_in_days+3:division_in_days + 5])/2,sum(float(elem[:-1]) for elem in temperature[division_in_days+5:division_in_days + 7])/2,sum(float(elem[:-1]) for elem in temperature[division_in_days+7:division_in_days + 8])]
-		information[day]['avg_temp'] = sum(information[day]['temp']) / len(information[day]['temp'])
+		information['temp'] = [sum(float(elem[:-1]) for elem in temperature[division_in_days:division_in_days + 3])/3,sum(float(elem[:-1]) for elem in temperature[division_in_days+3:division_in_days + 5])/2,sum(float(elem[:-1]) for elem in temperature[division_in_days+5:division_in_days + 7])/2,sum(float(elem[:-1]) for elem in temperature[division_in_days+7:division_in_days + 8])]
+		information['avg_temp'] = sum(information['temp']) / len(information['temp'])
 		#kind of weather
-		information[day]['kind_of_weather'] = kind_of_weather[int((division_in_days * 2 + 9) / 2)]
+		information['kind_of_weather'] = kind_of_weather[int((division_in_days * 2 + 9) / 2)]
 		# converting fallings into percents
 		for i,elem in enumerate(fallings):
 			fallings[i] = float(elem[:-2].replace(',','.').replace(' ','')) * 30
 			if fallings[i] > 100: fallings[i] = 100
 		#falling and avg_fallings
-		information[day]['fallings'] = [float(sum(fallings[division_in_days:division_in_days + 3])/3),float(sum(fallings[division_in_days+3:division_in_days + 5])/2),float(sum(fallings[division_in_days+5:division_in_days + 7])/2),float(sum(fallings[division_in_days+7:division_in_days + 8]))]
-		information[day]['avg_fallings'] = sum(information[day]['fallings']) / len(information[day]['fallings'])
+		information['fallings'] = [float(sum(fallings[division_in_days:division_in_days + 3])/3),float(sum(fallings[division_in_days+3:division_in_days + 5])/2),float(sum(fallings[division_in_days+5:division_in_days + 7])/2),float(sum(fallings[division_in_days+7:division_in_days + 8]))]
+		information['avg_fallings'] = sum(information['fallings']) / len(information['fallings'])
 
 		return information
 
 	async def sinoptik_parser(self):
 		# taking information from the sinoptik website
-		day = str(self.date.date_)
-		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[0,0,0,0],'fallings':[0,0,0,0]}}
+		information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[0,0,0,0],'fallings':[0,0,0,0]}
 		#getting all information for the day
 		soup = await self._get_soup(self.urls['sinoptik'])
 		items = soup.find_all('tr',class_ = None)[2].findAll('td')
@@ -224,30 +218,22 @@ class Parser:
 		i = 0
 		for j in range(len(fallings)):
 			if j % 2 == 0 and j != 0:
-				information[day]['fallings'][i] /= 2
-				information[day]['temp'][i] /= 2
+				information['fallings'][i] /= 2
+				information['temp'][i] /= 2
 				i+=1
 			if fallings[j] == '-':
-				information[day]['fallings'][i] += 0
+				information['fallings'][i] += 0
 			else:
-				information[day]['fallings'][i] += float(fallings[j])
-			information[day]['temp'][i] += float(temperature[j][:-1])
+				information['fallings'][i] += float(fallings[j])
+			information['temp'][i] += float(temperature[j][:-1])
 		else:
-			information[day]['fallings'][-1] /= 2
-			information[day]['temp'][-1] /= 2
+			information['fallings'][-1] /= 2
+			information['temp'][-1] /= 2
 
 		#avg_fallings and avg_temp
-		information[day]['avg_fallings'] = sum(information[day]['fallings'])/len(information[day]['fallings'])
-		information[day]['avg_temp'] = sum(information[day]['temp'])/len(information[day]['temp'])
+		information['avg_fallings'] = sum(information['fallings'])/len(information['fallings'])
+		information['avg_temp'] = sum(information['temp'])/len(information['temp'])
 		
 		return information
 
 		
-if __name__ == '__main__':
-	from make_urls import MakeUrls
-	from date_manager import DateManager
-	date_ = DateManager('2021.09.14')
-	urls = MakeUrls('трускавець',date_).make_url()
-	info_getter = Parser(urls,date_)
-	info = asyncio.run(info_getter.get_info())
-	print(info)
