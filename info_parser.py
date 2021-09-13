@@ -3,6 +3,7 @@ import re
 import datetime
 
 import aiohttp
+from aiohttp.web import HTTPTooManyRequests
 from bs4 import BeautifulSoup
 
 import configure
@@ -20,12 +21,25 @@ class Parser:
 			async with session.get(url,headers = configure.HEADERS) as response:
 				if response.status == 200:
 					return await response.text()
+				elif response.status == 429:
+					raise HTTPTooManyRequests
 				else:
 					return 
 
 	async def _get_soup(self,url):
 		# returns BeatutifulSoup object for working with it
-		result = await self._make_request(url)
+		i = 0
+		while i < 5:
+			try:
+				result = await self._make_request(url)
+			except HTTPTooManyRequests:
+				i += 1
+				await asyncio.sleep(0.2)
+			else:
+				break
+		else:
+			raise HTTPTooManyRequests
+
 		return BeautifulSoup(result,'html.parser')
 
 	async def get_info(self):
