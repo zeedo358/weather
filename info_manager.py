@@ -1,7 +1,10 @@
-from datetime import date
+import asyncio
+import time
+
 from make_urls import MakeUrls
 from date_manager import DateManager
 from parser import Parser
+
 
 class Manager:
 	"""Class which manages all information,making average data from all data was given"""
@@ -10,9 +13,9 @@ class Manager:
 		self.date_ = DateManager(usr_date)
 
 	def _get_info(self):
-		urls = MakeUrls(self.place,self.date_).make_url()
+		urls = MakeUrls(self.place,self.date_).make_urls()
 		info_getter = Parser(urls,self.date_)
-		info = info_getter.get_info()
+		info = asyncio.run(info_getter.get_info())
 		return info
 
 	def manage_info(self):
@@ -51,7 +54,9 @@ class Manager:
 		return managed_information
 
 
-
+t0 = time.time()
 print(Manager('трускавець','2021.09.14').manage_info())
+delta = time.time() - t0
+print(delta)
 
 

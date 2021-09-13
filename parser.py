@@ -1,10 +1,11 @@
-import requests
-from bs4 import BeautifulSoup
-import configure
+import asyncio
 import re
 import datetime
 
+import aiohttp
+from bs4 import BeautifulSoup
 
+import configure
 
 class Parser:
 	"""Main class of parsers, which includes 2 functions for getting html code of urls"""
@@ -13,38 +14,37 @@ class Parser:
 		self.date = date
 		self.registered_methods = []
 
-	def _make_request(self,name,params = None):
+	async def _make_request(self,url):
 		# making a request to a web site
-		if type(self.urls[name]) == list:
-			reqs = tuple(requests.get(url,headers = configure.HEADERS, params = params) for url in self.urls[name])
-		else:	
-			reqs = tuple(requests.get(url,headers = configure.HEADERS, params = params) for url in [self.urls[name]])
-		results = set(res.status_code for res in reqs)
-		if len(results) == 1 and 200 in results:
-			return reqs
-		else:
-			return []
+		async with aiohttp.ClientSession() as session:
+			async with session.get(url,headers = configure.HEADERS) as response:
+				if response.status == 200:
+					return await response.text()
+				else:
+					return 
 
-	def _get_soup(self,name):
+	async def _get_soup(self,url):
 		# returns BeatutifulSoup object for working with it
-		return tuple(BeautifulSoup(req.text,'html.parser') for req in self._make_request(name))
-	def get_info(self):
+		result = await self._make_request(url)
+		return BeautifulSoup(result,'html.parser')
+
+	async def get_info(self):
 		#calling all parsers
-		info = [self.google_parser(),
+		info = await asyncio.gather(self.google_parser(),
 		self.meteotrend_parser(),
 		self.meteoprog_parser(),
 		self.pogoda33_parser(),
-		self.sinoptik_parser()]
+		self.sinoptik_parser())
 
 		return info
 
-	def google_parser(self):
+	async def google_parser(self):
 		# taking information from the google website
 		day = str(self.date.date_)
 		separator = r'\d+'
 		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
 		#get fallings
-		soup = self._get_soup('google')[0]
+		soup = await self._get_soup(self.urls['google'])
 		items = soup.find_all('div',class_ = 'XwOqJe')
 		fallings = []
 		for i,elem in enumerate(items):
@@ -73,7 +73,7 @@ class Parser:
 
 		return information
 
-	def meteotrend_parser(self):
+	async def meteotrend_parser(self):
 		# taking information from the meteotrend website
 		day = str(self.date.date_)
 		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
@@ -83,7 +83,7 @@ class Parser:
 		searched_day = '{}, {} {} {}'.format(self.date.get_day(),self.date.date_.day,self.date.get_month(),self.date.date_.year)
 
 
-		soup = self._get_soup('meteotrend')[0]
+		soup = await self._get_soup(self.urls['meteotrend'])
 		blocks = soup.find_all('div',class_ = 'box')
 
 		for block in blocks:
@@ -130,13 +130,14 @@ class Parser:
 
 		return information
 
-	def meteoprog_parser(self):
+	async def meteoprog_parser(self):
 		# taking information from the meteoprog website
 		day = str(self.date.date_)
 		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
 		searched_day = '{} {},'.format(self.date.date_.day,self.date.get_month())
+	
+		soup,soup2 = await asyncio.gather(*[self._get_soup(url) for url in self.urls['meteoprog']])
 
-		soup,soup2 = self._get_soup('meteoprog')
 		# getting kinds of weather for days of week
 		kinds = [item.text for item in soup.find_all('div',class_ = 'infoPrognosis widthProg')] + [item.text for item in soup2.find_all('div',class_ = 'infoPrognosis widthProg')[:2]]
 		# getting all names of days
@@ -166,12 +167,12 @@ class Parser:
 
 		return information
 
-	def pogoda33_parser(self):
+	async def pogoda33_parser(self):
 		# taking information from the pogoda33 website
 		day = str(self.date.date_)
 		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}}
 
-		soup = self._get_soup('pogoda33')[0]
+		soup = await self._get_soup(self.urls['pogoda33'])
 		# time starts with 00:00 step = 3 hours
 		# parsing all information for all days in week
 		temperature  = [item.text for item in soup.find_all('span',class_ = 'forecast-temp')]
@@ -194,12 +195,12 @@ class Parser:
 
 		return information
 
-	def sinoptik_parser(self):
+	async def sinoptik_parser(self):
 		# taking information from the sinoptik website
 		day = str(self.date.date_)
 		information = {day:{'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[0,0,0,0],'fallings':[0,0,0,0]}}
 		#getting all information for the day
-		soup = self._get_soup('sinoptik')[0]
+		soup = await self._get_soup(self.urls['sinoptik'])
 		items = soup.find_all('tr',class_ = None)[2].findAll('td')
 		fallings = [item.text for item in items]
 		items = soup.find('tr',class_ = 'temperature').findAll('td')
@@ -228,3 +229,11 @@ class Parser:
 		return information
 
 		
+if __name__ == '__main__':
+	from make_urls import MakeUrls
+	from date_manager import DateManager
+	date_ = DateManager('2021.09.14')
+	urls = MakeUrls('трускавець',date_).make_url()
+	info_getter = Parser(urls,date_)
+	info = asyncio.run(info_getter.get_info())
+	print(info)

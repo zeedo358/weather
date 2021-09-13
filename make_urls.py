@@ -1,4 +1,5 @@
 import configure
+
 class MakeUrls():
 	"""Class makes the url adress for making a request"""
 	def __init__(self, place,date):
@@ -6,7 +7,7 @@ class MakeUrls():
 		self.date = date
 		self._transcription_leters = configure.localization
 	
-	def make_url(self):
+	def make_urls(self):
 		google_url = configure.URL_GOOGLE.format(self.place,self.date.date_.strftime("%d"),self.date.date_.strftime("%m"))
 		sinoptik_url = configure.URL_SINOPTIK.format(self.place,str(self.date.date_))
 		pogoda33_url = configure.URL_POGODA33.format(self.place)
