@@ -1,11 +1,12 @@
 from datetime import date
+import configure
 
 class DateManager:
 	"""docstring for DataManager"""
 	def __init__(self, usr_date):
 		self.date_ = date(*map(int,usr_date.split('.')))
-		self._days = ['понеділок','вівторок','середа','четвер','пʼятниця','субота','неділя']
-		self._months = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня']
+		self._days = configure.DAYS
+		self._months = configure.MONTHS
 	def get_day(self):
 		#returns name of day of date was given
 		return self._days[self.date_.weekday()]

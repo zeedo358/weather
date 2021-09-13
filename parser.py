@@ -104,11 +104,16 @@ class Parser:
 					information[day]['fallings'][key] = 0
 
 				data = [item.text for item in info.find('td',class_ = 't0').find_all('b')]
-				avg_temp = (float(data[0])+float(data[1][:-2]))/2
+				if len(data) == 3:
+					avg_temp = (float(data[0])+float(data[1][:3]))/2
+					mini_desc = data[2]
+				else:
+					avg_temp = (float(data[0][:3])+float(data[0][:3]))/2
+					mini_desc = data[1]
 				information[day]['temp'][key] = avg_temp
 				#taking kind of weather from middle time of day 
 				if key == 2:
-					information[day]['kind_of_weather'] = data[2]
+					information[day]['kind_of_weather'] = mini_desc
 		# average temperature, fallings
 		len_temp = 0
 		len_fallings = 0

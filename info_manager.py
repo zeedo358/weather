@@ -52,6 +52,6 @@ class Manager:
 
 
 
-print(Manager('трускавець','2021.08.17').manage_info())
+print(Manager('трускавець','2021.09.14').manage_info())
 
 

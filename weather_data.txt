@@ -1,0 +1,19 @@
+All searching requests:
+https://www.google.com/search?q=погода+TOWN+D.M
+https://ua.sinoptik.ua/погода-TOWN/Y-M-D
+https://pogoda33.ua/погода-Town/тиждень
+https://www.meteoprog.ua/ua/weather/Kyiv/
+https://ua.meteotrend.com/forecast/ua/truskavets/
+
+All data:
+День, середня температура, середній % опадів, вид погоди, температура(ніч,ранок,день,вечір),опади(ніч,ранок,день,вечір)
+
+{
+	day:{
+	kind_of_weather:str
+	avg_temp:int
+	avg_fallings:int
+	temp:list
+	fallings:list
+	}
+}
