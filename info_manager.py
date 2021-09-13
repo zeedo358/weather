@@ -3,7 +3,7 @@ import time
 
 from make_urls import MakeUrls
 from date_manager import DateManager
-from parser import Parser
+from info_parser import Parser
 
 
 class Manager:
