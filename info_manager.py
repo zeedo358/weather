@@ -52,11 +52,11 @@ class Manager:
 
 		return managed_information
 
-def save_data(data):
+def _save_data(data):
 	with open('data.pickle','wb') as file:
 		pickle.dump(data,file)
 
-def load_data():
+def _load_data():
 	try:
 		with open('data.pickle','rb') as file:
 			return pickle.load(file)
@@ -65,8 +65,8 @@ def load_data():
 
 
 
-def main(city,date):
-	data = load_data()
+def execute(city,date):
+	data = _load_data()
 	last_time_updated = data.get(city) # 0 - last time of update, 1 - data
 	if last_time_updated == None or last_time_updated.get(date) == None or time.time() - last_time_updated[date][0] > 1200:
 		request = Manager(city,date)
@@ -75,13 +75,7 @@ def main(city,date):
 			data[request.place].update({date:[time.time(),result_of_request]})
 		else:
 			data[request.place] = {date:[time.time(),result_of_request]}
-		save_data(data)
+		_save_data(data)
 	return data[city][date][1]
 
 
-
-if __name__ == '__main__':
-	t0 = time.time()
-	print(main('трускавець','2021.09.14'))
-	delta = time.time() - t0
-	print(delta)

@@ -213,22 +213,31 @@ class Parser:
 		fallings = [item.text for item in items]
 		items = soup.find('tr',class_ = 'temperature').findAll('td')
 		temperature = [item.text for item in items]
-
+		print(fallings)
 		#fallings and temperature
-		i = 0
-		for j in range(len(fallings)):
-			if j % 2 == 0 and j != 0:
-				information['fallings'][i] /= 2
-				information['temp'][i] /= 2
-				i+=1
-			if fallings[j] == '-':
-				information['fallings'][i] += 0
-			else:
-				information['fallings'][i] += float(fallings[j])
-			information['temp'][i] += float(temperature[j][:-1])
+		if len(fallings) == 4:
+			information['fallings'] = list(map(float,fallings))
+			information['temp'] = list(map(float,(temp[:-1] for temp in temperature)))
 		else:
-			information['fallings'][-1] /= 2
-			information['temp'][-1] /= 2
+			i = 0
+			for j in range(len(fallings)):
+				if j % 2 == 0 and j != 0:
+					information['fallings'][i] /= 2
+					information['temp'][i] /= 2
+					i += 1
+				if fallings[j] == '-':
+					if fallings[j + 1] != '-':
+						information['fallings'][i] += fallings[j + 1] * 0.7
+					elif fallings[j - 1] != '-':
+						information['fallings'][i] += fallings[j - 1] * 0.7
+					else:
+						information['fallings'][i] += 0
+				else:
+					information['fallings'][i] += float(fallings[j])
+				information['temp'][i] += float(temperature[j][:-1])
+			else:
+				information['fallings'][-1] /= 2
+				information['temp'][-1] /= 2
 
 		#avg_fallings and avg_temp
 		information['avg_fallings'] = sum(information['fallings'])/len(information['fallings'])
