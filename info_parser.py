@@ -213,7 +213,7 @@ class Parser:
 		fallings = [item.text for item in items]
 		items = soup.find('tr',class_ = 'temperature').findAll('td')
 		temperature = [item.text for item in items]
-		print(fallings)
+
 		#fallings and temperature
 		if len(fallings) == 4:
 			information['fallings'] = list(map(float,fallings))
