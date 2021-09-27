@@ -8,6 +8,9 @@ from bs4 import BeautifulSoup
 
 import configure
 
+class TownError(Exception):
+	pass
+
 class Parser:
 	"""Main class of parsers, which includes 2 functions for getting html code of urls"""
 	def __init__(self,urls,date):
@@ -23,8 +26,10 @@ class Parser:
 					return await response.text()
 				elif response.status == 429:
 					raise HTTPTooManyRequests
+				elif response.status == 404:
+					raise TownError
 				else:
-					return 
+					return
 
 	async def _get_soup(self,url):
 		# returns BeatutifulSoup object for working with it
