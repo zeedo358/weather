@@ -71,7 +71,7 @@ def execute(city,date):
 	if last_time_updated == None or last_time_updated.get(date) == None or time.time() - last_time_updated[date][0] > 1200:
 		request = Manager(city,date)
 		result_of_request = request.manage_info()
-		if data:
+		if data.get(city) != None:
 			data[request.place].update({date:[time.time(),result_of_request]})
 		else:
 			data[request.place] = {date:[time.time(),result_of_request]}
