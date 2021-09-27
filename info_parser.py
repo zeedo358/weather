@@ -49,11 +49,11 @@ class Parser:
 
 	async def get_info(self):
 		#calling all parsers
-		info = await asyncio.gather(self.google_parser(),
+		info = await asyncio.gather(self.sinoptik_parser(),
 		self.meteotrend_parser(),
 		self.meteoprog_parser(),
 		self.pogoda33_parser(),
-		self.sinoptik_parser())
+		self.google_parser())
 
 		return info
 
@@ -140,9 +140,11 @@ class Parser:
 			if elem2 != None:
 				information['avg_fallings'] += elem2
 				len_fallings += 1
-
-		information['avg_temp'] /= len_temp
-		information['avg_fallings'] /= len_fallings
+		try:
+			information['avg_temp'] /= len_temp
+			information['avg_fallings'] /= len_fallings
+		except ZeroDivisionError:
+			pass
 
 		return information
 
