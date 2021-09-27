@@ -22,7 +22,7 @@ class Manager:
 	def manage_info(self):
 		data = self._get_info()
 		managed_information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[0,0,0,0],'fallings':[0,0,0,0]}
-		managed_information['kind_of_weather'] = data[4]['kind_of_weather'] # kind of weather from google website
+		managed_information['kind_of_weather'] = data[3]['kind_of_weather'] # kind of weather from google website
 		# managing data of avg fallings and avg temperature
 		for info in data:
 			managed_information['avg_temp'] += info['avg_temp']

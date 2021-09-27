@@ -5,8 +5,6 @@ config = {
 
 URL_GOOGLE = 'https://www.google.com/search?q=погода+{}+{}.{}'
 URL_SINOPTIK = 'https://ua.sinoptik.ua/погода-{}/{}'
-URL_METEOPROG = 'https://www.meteoprog.ua/ua/weather/{}/'
-URL_METEOPROG_SECOND = 'https://www.meteoprog.ua/ua/weather/{}/6_10/'
 URL_POGODA33 = 'https://pogoda33.ua/погода-{}/тиждень'
 URL_METEOTREND = 'https://ua.meteotrend.com/forecast/ua/{}/'
 

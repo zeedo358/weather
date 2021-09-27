@@ -27,6 +27,7 @@ class Parser:
 				elif response.status == 429:
 					raise HTTPTooManyRequests
 				elif response.status == 404:
+					print(url)
 					raise TownError
 				else:
 					return
@@ -51,7 +52,6 @@ class Parser:
 		#calling all parsers
 		info = await asyncio.gather(self.sinoptik_parser(),
 		self.meteotrend_parser(),
-		self.meteoprog_parser(),
 		self.pogoda33_parser(),
 		self.google_parser())
 
@@ -148,42 +148,6 @@ class Parser:
 
 		return information
 
-	async def meteoprog_parser(self):
-		# taking information from the meteoprog website
-		information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}
-		searched_day = '{} {},'.format(self.date.date_.day,self.date.get_month())
-	
-		soup,soup2 = await asyncio.gather(*[self._get_soup(url) for url in self.urls['meteoprog']])
-
-		# getting kinds of weather for days of week
-		kinds = [item.text for item in soup.find_all('div',class_ = 'infoPrognosis widthProg')] + [item.text for item in soup2.find_all('div',class_ = 'infoPrognosis widthProg')[:2]]
-		# getting all names of days
-		names = [item.text for item in soup.find_all('span',class_ = 'bold')] + [item.text for item in soup2.find_all('span',class_ = 'bold')[:2]]
-		# getting all info of temperature of all days at week
-		temperature = [item.text for item in soup.find_all('span',class_ = 'temperature_value')[6:]] + [item.text for item in soup2.find_all('span',class_ = 'temperature_value')[6:15]]
-		separator = r'\D\S+'
-		# getting desctiption of weather
-		desc = [''.join(re.findall(separator,item)[3:]) for item in kinds] + [''.join(re.findall(separator,item)[3:]) for item in kinds[-2:]]
-		data = {names[i]:[desc[i]] for i in range(len(names))}
-
-		i = 4
-		for name in names:
-			data[name]+= temperature[i-4:i]
-			i += 4
-			
-		#kind of weather
-		information['kind_of_weather'] = data[searched_day][0].split('.')[0]
-		# avg temp and temperature
-		len_temp = 0
-		for i,elem in enumerate(data[searched_day][1:]):
-			information['temp'][i] = float(elem)
-			if elem != None:
-				information['avg_temp'] += float(elem)
-				len_temp += 1
-		information['avg_temp'] /= len_temp
-
-		return information
-
 	async def pogoda33_parser(self):
 		# taking information from the pogoda33 website
 		information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[None,None,None,None],'fallings':[None,None,None,None]}
@@ -234,9 +198,9 @@ class Parser:
 					i += 1
 				if fallings[j] == '-':
 					if fallings[j + 1] != '-':
-						information['fallings'][i] += fallings[j + 1] * 0.7
-					elif fallings[j - 1] != '-':
-						information['fallings'][i] += fallings[j - 1] * 0.7
+						information['fallings'][i] += float(fallings[j + 1]) * 0.7
+					elif fallings[j - 1] != '-' and j != 0:
+						information['fallings'][i] += float(fallings[j - 1]) * 0.7
 					else:
 						information['fallings'][i] += 0
 				else:
