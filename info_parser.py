@@ -27,7 +27,6 @@ class Parser:
 				elif response.status == 429:
 					raise HTTPTooManyRequests
 				elif response.status == 404:
-					print(url)
 					raise TownError
 				else:
 					return

@@ -2,7 +2,6 @@ All searching requests:
 https://www.google.com/search?q=погода+TOWN+D.M
 https://ua.sinoptik.ua/погода-TOWN/Y-M-D
 https://pogoda33.ua/погода-Town/тиждень
-https://www.meteoprog.ua/ua/weather/Kyiv/
 https://ua.meteotrend.com/forecast/ua/truskavets/
 
 All data:
