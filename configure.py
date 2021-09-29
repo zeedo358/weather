@@ -1,8 +1,3 @@
-config = {
-    'name' : 'Weather Bot',
-    'token' : 'NONE'
-}
-
 URL_GOOGLE = 'https://www.google.com/search?q=погода+{}+{}.{}'
 URL_SINOPTIK = 'https://ua.sinoptik.ua/погода-{}/{}'
 URL_POGODA33 = 'https://pogoda33.ua/погода-{}/тиждень'

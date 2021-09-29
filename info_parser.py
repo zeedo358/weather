@@ -77,7 +77,10 @@ class Parser:
 			information['fallings'] = fallings_for_time
 
 		# average fallings
-		avg = sum(fallings) / len(fallings)
+		try:
+			avg = sum(fallings) / len(fallings)
+		except ZeroDivisionError:
+			raise TownError
 		information['avg_fallings'] = avg
 
 		#average temperature
