@@ -50,9 +50,9 @@ class Parser:
 	async def get_info(self):
 		#calling all parsers
 		info = await asyncio.gather(self.sinoptik_parser(),
+		self.google_parser(),
 		self.meteotrend_parser(),
-		self.pogoda33_parser(),
-		self.google_parser())
+		self.pogoda33_parser())
 
 		return info
 
@@ -154,8 +154,10 @@ class Parser:
 		soup = await self._get_soup(self.urls['pogoda33'])
 		# time starts with 00:00 step = 3 hours
 		# parsing all information for all days in week
-		temperature  = [item.text for item in soup.find_all('span',class_ = 'forecast-temp')]
 		kind_of_weather = [item.text for item in soup.find_all('div',class_ = 'col-3 col-md-2 sky-icon my-auto')]
+		if not kind_of_weather:
+			return None
+		temperature  = [item.text for item in soup.find_all('span',class_ = 'forecast-temp')]
 		fallings = [item.text for item in soup.find_all('div',class_ = 'col-md-1 w-middle d-none d-md-block')[::2]]
 
 		division_in_days = ((self.date.date_ - self.date.date_.today()).days) * 8 # 8 hours at half a day
