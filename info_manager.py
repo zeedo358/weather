@@ -24,7 +24,6 @@ class Manager:
 		while None in data:
 			data.remove(None)
 		managed_information = {'kind_of_weather':'','avg_temp':0,'avg_fallings':0,'temp':[0,0,0,0],'fallings':[0,0,0,0]}
-		managed_information['kind_of_weather'] = data[1]['kind_of_weather'] # kind of weather from google website on index 1
 		# managing data of avg fallings and avg temperature
 		for info in data:
 			managed_information['avg_temp'] += info['avg_temp']
@@ -51,6 +50,21 @@ class Manager:
 				managed_information['fallings'][i] = round(managed_information['fallings'][i] / len_fallings,1)
 				len_temp = 0
 				len_fallings = 0
+
+		if 8 < managed_information['avg_fallings'] <= 15 and managed_information['avg_temp'] <= 0:
+			managed_information['kind_of_weather'] = 'Невеликий сніг'
+		elif managed_information['avg_fallings'] > 15 and managed_information['avg_temp'] <= 0:
+			managed_information['kind_of_weather'] = 'Сніг'
+		elif 8 < managed_information['avg_fallings'] <= 15 and managed_information['avg_temp'] > 0:
+			managed_information['kind_of_weather'] = 'Невеликий дощ'
+		elif  15 < managed_information['avg_fallings'] <= 50 and managed_information['avg_temp'] > 0:
+			managed_information['kind_of_weather'] = 'Дощ'
+		elif  50 < managed_information['avg_fallings'] and managed_information['avg_temp'] > 0:
+			managed_information['kind_of_weather'] = 'Зливи'
+		elif  2.5 < managed_information['avg_fallings'] <= 8:
+			managed_information['kind_of_weather'] = 'Мінлива хмарність'
+		elif managed_information['avg_fallings'] <= 2.5:
+			managed_information['kind_of_weather'] = 'Ясно'
 
 		return managed_information
 
