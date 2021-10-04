@@ -201,7 +201,7 @@ class Parser:
 					information['temp'][i] /= 2
 					i += 1
 				if fallings[j] == '-':
-					if fallings[j + 1] != '-':
+					if j + 1 < len(fallings) and fallings[j + 1] != '-':
 						information['fallings'][i] += float(fallings[j + 1]) * 0.7
 					elif fallings[j - 1] != '-' and j != 0:
 						information['fallings'][i] += float(fallings[j - 1]) * 0.7
