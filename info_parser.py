@@ -107,7 +107,7 @@ class Parser:
 		for block in blocks:
 			name = block.find('h5').text
 			# checking is this day we're searching
-			if repr(name.replace('\'','ʼ')) == repr(searched_day):
+			if repr(name.replace('\'','ʼ').strip()) != repr(searched_day):
 				continue
 			info_for_blocks = block.findAll('div',class_ = 'm7')
 			for info in info_for_blocks:
@@ -147,7 +147,7 @@ class Parser:
 			information['avg_fallings'] /= len_fallings
 		except ZeroDivisionError:
 			pass
-
+		
 		return information
 
 	async def pogoda33_parser(self):

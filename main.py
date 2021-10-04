@@ -4,4 +4,4 @@ def main(city,date):
     return execute(city,date)
 
 if __name__ == '__main__':
-    print(main('Київ','2021.09.29'))
+    print(main('Трускавець','2021.10.04'))
