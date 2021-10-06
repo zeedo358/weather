@@ -64,6 +64,10 @@ class Parser:
 		soup = await self._get_soup(self.urls['google'])
 		items = soup.find_all('div',class_ = 'XwOqJe')
 		fallings = []
+
+		if not items:
+			return None
+
 		for i,elem in enumerate(items):
 			# taking 24 hours for day we need
 			if i < (24 - datetime.datetime.now().hour) + ((self.date.date_ - self.date.date_.today()).days * 24) and i >= (23 - datetime.datetime.now().hour) + (((self.date.date_ - self.date.date_.today()).days -1) * 24): # 24 hours
