@@ -1,4 +1,5 @@
 # Advanced weather forecast
+Advanced weather forecast in your city [Ukraine]
 
 To use the script:
 First install requirements [pip install -r requirements.txt].
